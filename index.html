@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>REBIRTH EVENT</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      margin: 0;
+      padding:
+        calc(12px + env(safe-area-inset-top))
+        calc(14px + env(safe-area-inset-right))
+        calc(28px + env(safe-area-inset-bottom))
+        calc(14px + env(safe-area-inset-left));
+      background: #171923;
+      color: #f5f5f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 2px 0 4px;
+      font-size: 22px;
+      letter-spacing: 0.4px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #aab0c0;
+      margin: 0 0 14px;
+      font-size: 13px;
+    }
+
+    /* 상단 고정 빠른 컨트롤 바 */
+    .sticky-deck {
+      position: sticky;
+      top: calc(6px + env(safe-area-inset-top));
+      z-index: 30;
+      background: rgba(27, 31, 44, 0.96);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid #363d54;
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    .sticky-now {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #d6dcf0;
+      margin-bottom: 8px;
+    }
+
+    .sticky-now-title {
+      font-weight: bold;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sticky-now-time {
+      color: #aab0c0;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+
+    .sticky-deck input[type="range"] {
+      height: 22px;
+      margin: 0 0 8px;
+    }
+
+    .sticky-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .sticky-row-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .sticky-deck button {
+      margin-top: 0;
+      padding: 10px 8px;
+      font-size: 12.5px;
+      border-radius: 9px;
+    }
+
+    .panel {
+      background: #252938;
+      padding: 16px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      font-size: 17px;
+      margin: 0 0 10px;
+    }
+
+    h3 {
+      font-size: 14px;
+      color: #d6dcf0;
+      margin: 14px 0 6px;
+    }
+
+    button {
+      width: 100%;
+      min-height: 44px;
+      padding: 11px 12px;
+      border: none;
+      border-radius: 10px;
+      background: #5965d8;
+      color: white;
+      font-size: 13.5px;
+      font-weight: bold;
+      margin-top: 7px;
+      cursor: pointer;
+    }
+
+    button:active {
+      opacity: 0.72;
+      transform: scale(0.99);
+    }
+
+    .stop-button {
+      background: #a94452;
+    }
+
+    .music-button {
+      background: #26856d;
+    }
+
+    .replay-button {
+      background: #7b5cb8;
+    }
+
+    .start-sfx-btn {
+      background: #2b7de9;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    .sfx-btn {
+      background: #c48b1f;
+      color: #14161f;
+      text-align: center;
+    }
+
+    .drumroll-btn {
+      background: #8c48a6;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    .success-btn {
+      background: #b07818;
+      color: #fffbe6;
+      text-align: center;
+    }
+
+    .move-btn {
+      background: #2d7a78;
+      text-align: center;
+    }
+
+    .quiz-btn {
+      background: #3d529e;
+      text-align: center;
+    }
+
+    .quiz-pick-btn {
+      background: #35688a;
+      text-align: center;
+    }
+
+    .quiz-ask-btn {
+      background: #4763a8;
+      color: #eef3ff;
+      text-align: center;
+    }
+
+    .quiz-answer-btn {
+      background: #8f6218;
+      color: #fffbe6;
+      text-align: center;
+    }
+
+    .oha-choice-btn {
+      background: #2f6f8e;
+      text-align: center;
+    }
+
+    .oha-rank-btn {
+      background: #47526e;
+      text-align: center;
+    }
+
+    .cue-btn {
+      text-align: left;
+    }
+
+    .cue-btn.success-btn,
+    .cue-btn.move-btn,
+    .cue-btn.quiz-btn,
+    .cue-btn.quiz-pick-btn,
+    .cue-btn.quiz-ask-btn,
+    .cue-btn.quiz-answer-btn,
+    .cue-btn.oha-choice-btn,
+    .cue-btn.oha-rank-btn {
+      text-align: center;
+    }
+
+    .cue-btn.active {
+      outline: 2px solid #8ef0c8;
+      background: #3d4ac4;
+    }
+
+    .cue-btn.success-btn.active,
+    .cue-btn.quiz-answer-btn.active {
+      outline: 2px solid #fff3a1;
+      background: #d99722;
+      color: #14161f;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+    }
+
+    .status {
+      color: #b8c0d8;
+      font-size: 12.5px;
+      margin-top: 10px;
+      line-height: 1.45;
+    }
+
+    .player {
+      background: #1b1f2c;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 10px;
+    }
+
+    .player-title {
+      font-size: 13.5px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      color: #b8c0d8;
+      font-size: 12px;
+      margin-top: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #7985ff;
+      cursor: pointer;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 60px;
+      background: #1b1f2c;
+      color: #f5f5f5;
+      border: 1px solid #3c425a;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      margin-top: 6px;
+    }
+
+    /* 접기/펼치기 섹션 */
+    details.fold-panel {
+      background: #252938;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+
+    details.fold-panel > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 15px 16px;
+      font-size: 16.5px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #252938;
+    }
+
+    details.fold-panel > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.fold-panel > summary::after {
+      content: "▾";
+      font-size: 14px;
+      color: #aab0c0;
+    }
+
+    details.fold-panel:not([open]) > summary::after {
+      content: "▸";
+    }
+
+    .fold-body {
+      padding: 0 16px 16px;
+    }
+
+    .mission {
+      border-left: 4px solid #7985ff;
+      padding-left: 12px;
+      margin-bottom: 12px;
+    }
+
+    .mission:last-child {
+      margin-bottom: 0;
+    }
+
+    .small {
+      color: #aab0c0;
+      font-size: 12.5px;
+      margin: 4px 0 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <h1>REBIRTH EVENT</h1>
+    <p class="subtitle">환생 프로젝트 진행 컨트롤러</p>
+
+    <!-- 상단 고정 빠른 컨트롤 -->
+    <div class="sticky-deck">
+      <div class="sticky-now">
+        <span class="sticky-now-title" id="stickyVoiceTitle">진행 음성 대기 중</span>
+        <span class="sticky-now-time" id="stickyVoiceTime">00:00 / 00:00</span>
+      </div>
+      <input
+        type="range"
+        id="stickyVoiceProgress"
+        min="0"
+        max="100"
+        value="0"
+        step="0.1"
+        oninput="seekVoice(this.value)"
+      >
+      <div class="sticky-row">
+        <button onclick="startVoice()">▶ 음성</button>
+        <button class="stop-button" onclick="pauseVoice()">⏸ 정지</button>
+        <button class="replay-button" onclick="restartVoice()">↺ 처음</button>
+      </div>
+      <div class="sticky-row-2">
+        <button class="start-sfx-btn" onclick="playStartSfx()">🚀 시작 효과음</button>
+        <button class="sfx-btn" onclick="playSuccessSfx()">🎉 축하 효과음</button>
+      </div>
+    </div>
+
+    <!-- 배경음악 -->
+    <details class="fold-panel">
+      <summary>🎵 배경음악</summary>
+      <div class="fold-body">
+        <button class="music-button" onclick="startMusic()">
+          ▶ 배경음악 재생
+        </button>
+
+        <button class="stop-button" onclick="pauseMusic()">
+          ⏸ 배경음악 일시정지
+        </button>
+
+        <button class="replay-button" onclick="restartMusic()">
+          ↺ 처음부터 다시 재생
+        </button>
+
+        <div class="player">
+          <div class="player-title">배경음악 재생 현황</div>
+
+          <input
+            type="range"
+            id="musicProgress"
+            min="0"
+            max="100"
+            value="0"
+            step="0.1"
+            oninput="seekMusic(this.value)"
+          >
+
+          <div class="time-row">
+            <span id="musicCurrent">00:00</span>
+            <span id="musicDuration">00:00</span>
+          </div>
+        </div>
+
+        <p class="status" id="musicStatus">
+          배경음악을 재생할 준비가 되었습니다.
+        </p>
+      </div>
+    </details>
+
+    <!-- 진행 음성 및 퀴즈 컨트롤 -->
+    <section class="panel">
+      <h2>🎙️ 진행 음성</h2>
+
+      <div class="player">
+        <div class="player-title" id="voiceTitle">진행 음성 재생 현황</div>
+
+        <input
+          type="range"
+          id="voiceProgress"
+          min="0"
+          max="100"
+          value="0"
+          step="0.1"
+          oninput="seekVoice(this.value)"
+        >
+
+        <div class="time-row">
+          <span id="voiceCurrent">00:00</span>
+          <span id="voiceDuration">00:00</span>
+        </div>
+      </div>
+
+      <p class="status" id="voiceStatus">
+        음성 버튼을 누르면 해당 음성이 재생됩니다.
+      </p>
+
+      <h3>인트로 · 퍼즐 찾기 · 야바위</h3>
+      <button class="cue-btn" data-cue="intro" onclick="playCue('intro')">01. 인트로</button>
+      <button class="cue-btn move-btn" data-cue="to_m1_move" onclick="playCue('to_m1_move')">➡ 퍼즐 찾기로 이동하겠습니다</button>
+      <div class="grid-2">
+        <button class="cue-btn" data-cue="m1_start" onclick="playCue('m1_start')">02. 퍼즐 찾기 시작</button>
+        <button class="cue-btn success-btn" data-cue="m1_success" onclick="playCue('m1_success')">03. 퍼즐 찾기 성공</button>
+      </div>
+
+      <button class="cue-btn move-btn" data-cue="to_m2_move" onclick="playCue('to_m2_move')">➡ 야바위 이동하겠습니다</button>
+      <div class="grid-2">
+        <button class="cue-btn" data-cue="m2_start" onclick="playCue('m2_start')">04. 야바위 시작</button>
+        <button class="cue-btn success-btn" data-cue="m2_success" onclick="playCue('m2_success')">05. 야바위 성공</button>
+      </div>
+
+      <h3>퀴즈 (9개 분야 중 5개 선택)</h3>
+      <button class="cue-btn move-btn" data-cue="to_m3_move" onclick="playCue('to_m3_move')">➡ 퀴즈로 이동하겠습니다</button>
+      <button class="cue-btn" data-cue="m3_start" onclick="playCue('m3_start')">07. 퀴즈 시작</button>
+      <button class="cue-btn quiz-pick-btn" data-cue="quiz_pick_1" onclick="playCue('quiz_pick_1')">첫 번째 분야 선택 안내</button>
+
+      <p class="small">퀴즈 분야 문제 (9개 중 선택)</p>
+      <div class="grid-3" id="quizButtons"></div>
+      <button class="cue-btn quiz-ask-btn" data-cue="quiz_06_ask" onclick="playCue('quiz_06_ask')">우주 · 정답은 무엇일까요?</button>
+
+      <p class="small">회차별 정답 멘트 (1~4번째 · 5번째는 퀴즈 종료와 함께 재생)</p>
+      <div class="grid-2">
+        <button class="cue-btn quiz-answer-btn" data-cue="quiz_answer_1" onclick="playCue('quiz_answer_1')">첫 번째 정답입니다</button>
+        <button class="cue-btn quiz-answer-btn" data-cue="quiz_answer_2" onclick="playCue('quiz_answer_2')">두 번째 정답입니다</button>
+        <button class="cue-btn quiz-answer-btn" data-cue="quiz_answer_3" onclick="playCue('quiz_answer_3')">세 번째 정답입니다</button>
+        <button class="cue-btn quiz-answer-btn" data-cue="quiz_answer_4" onclick="playCue('quiz_answer_4')">네 번째 정답입니다</button>
+      </div>
+
+      <button class="cue-btn" data-cue="m3_done" onclick="playCue('m3_done')">12. 모든 퀴즈 종료</button>
+
+      <h3>오하아사 순위 문항 (1~4번 / 1~12위)</h3>
+      <textarea id="ohaDayNote" placeholder="오늘 나온 오하아사 순위나 문제 내용을 메모해 두세요."></textarea>
+      <p class="small">선택지 번호 (1~4번)</p>
+      <div class="grid-4" id="ohaChoiceButtons"></div>
+      <p class="small">순위 (1~12위)</p>
+      <div class="grid-4" id="ohaRankButtons"></div>
+
+      <h3>도둑잡기 · 보물찾기 · 엔딩</h3>
+      <button class="cue-btn" data-cue="m4_start" onclick="playCue('m4_start')">13. 도둑잡기 시작</button>
+      <div class="grid-2">
+        <button class="cue-btn success-btn" data-cue="m4_win" onclick="playCue('m4_win')">16. 도둑잡기 성공</button>
+        <button class="cue-btn" data-cue="m4_fail" onclick="playCue('m4_fail')">17. 도둑잡기 실패</button>
+      </div>
+
+      <div class="grid-2">
+        <button class="cue-btn" data-cue="extra_pick" onclick="playCue('extra_pick')">18. 추가 퀴즈 선택</button>
+        <button class="cue-btn" data-cue="extra_ok" onclick="playCue('extra_ok')">19. 추가 퀴즈 정답</button>
+        <button class="cue-btn" data-cue="extra_done" onclick="playCue('extra_done')">20. 추가 퀴즈 완료</button>
+        <button class="cue-btn" data-cue="final_all" onclick="playCue('final_all')">21. 컬렉션 완성</button>
+        <button class="drumroll-btn" onclick="playDrumrollSfx()">🥁 두구두구 효과음</button>
+        <button class="cue-btn" data-cue="final_qr" onclick="playCue('final_qr')">22. QR코드 스캔 안내</button>
+        <button class="cue-btn" data-cue="final_go" onclick="playCue('final_go')">23. 보물찾기 시작</button>
+        <button class="cue-btn" data-cue="final_done" onclick="playCue('final_done')">24. 모든 아이템 획득</button>
+        <button class="cue-btn" data-cue="end_party" onclick="playCue('end_party')">25. 환생 · 공연 대기</button>
+        <button class="cue-btn" data-cue="end_guest" onclick="playCue('end_guest')">26. 게스트 소개</button>
+      </div>
+      <button class="cue-btn" data-cue="end_congrats" onclick="playCue('end_congrats')">27. 공연 후 생일 축하</button>
+    </section>
+
+    <!-- 미션 목록 -->
+    <details class="fold-panel">
+      <summary>📜 이벤트 진행</summary>
+      <div class="fold-body">
+        <div class="mission">
+          <strong>MISSION 1</strong>
+          <p class="small">퍼즐 찾기</p>
+        </div>
+
+        <div class="mission">
+          <strong>MISSION 2</strong>
+          <p class="small">야바위</p>
+        </div>
+
+        <div class="mission">
+          <strong>MISSION 3</strong>
+          <p class="small">퀴즈</p>
+        </div>
+
+        <div class="mission">
+          <strong>MISSION 4</strong>
+          <p class="small">도둑잡기</p>
+        </div>
+
+        <div class="mission">
+          <strong>FINAL MISSION</strong>
+          <p class="small">보물찾기 시작 및 환생</p>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <script>
+    const bgm = new Audio("audio/bgm.mp3");
+    bgm.loop = false;
+    bgm.volume = 0.35;
+
+    const startSfx = new Audio("audio/sfx_start.mp3");
+    startSfx.loop = false;
+    startSfx.volume = 1;
+
+    const sfx = new Audio("audio/sfx_success.mp3");
+    sfx.loop = false;
+    sfx.volume = 1;
+
+    const drumrollSfx = new Audio("audio/sfx_drumroll.mp3");
+    drumrollSfx.loop = false;
+    drumrollSfx.volume = 1;
+
+    const voice = new Audio();
+    voice.loop = false;
+    voice.volume = 1;
+
+    const CUES = {
+      intro:         { title: "01. 인트로", src: "audio/01_intro.mp3" },
+      to_m1_move:    { title: "퍼즐 찾기로 이동하겠습니다", src: "audio/01_to_m1_move.mp3" },
+      m1_start:      { title: "02. 퍼즐 찾기 시작", src: "audio/02_m1_start.mp3" },
+      m1_success:    { title: "03. 퍼즐 찾기 성공", src: "audio/03_m1_success.mp3" },
+      to_m2_move:    { title: "야바위 이동하겠습니다", src: "audio/03_to_m2_move.mp3" },
+      m2_start:      { title: "04. 야바위 시작", src: "audio/04_m2_start.mp3" },
+      m2_success:    { title: "05. 야바위 성공", src: "audio/05_m2_success.mp3" },
+      to_m3_move:    { title: "퀴즈로 이동하겠습니다", src: "audio/05_to_m3_move.mp3" },
+      m3_start:      { title: "07. 퀴즈 시작", src: "audio/07_m3_start.mp3" },
+      quiz_pick_1:   { title: "첫 번째 분야 선택 안내", src: "audio/quiz_pick_1.mp3" },
+      quiz_06_ask:   { title: "우주 · 정답은 무엇일까요?", src: "audio/quiz_06_ask.mp3" },
+      quiz_answer_1: { title: "첫 번째 정답입니다", src: "audio/quiz_answer_1.mp3" },
+      quiz_answer_2: { title: "두 번째 정답입니다", src: "audio/quiz_answer_2.mp3" },
+      quiz_answer_3: { title: "세 번째 정답입니다", src: "audio/quiz_answer_3.mp3" },
+      quiz_answer_4: { title: "네 번째 정답입니다", src: "audio/quiz_answer_4.mp3" },
+      m3_done:       { title: "12. 모든 퀴즈 종료", src: "audio/12_m3_done.mp3" },
+      m4_start:      { title: "13. 도둑잡기 시작", src: "audio/13_m4_start.mp3" },
+      m4_win:        { title: "16. 도둑잡기 성공", src: "audio/16_m4_win.mp3" },
+      m4_fail:       { title: "17. 도둑잡기 실패", src: "audio/17_m4_fail.mp3" },
+      extra_pick:    { title: "18. 추가 퀴즈 선택", src: "audio/extra_pick.mp3" },
+      extra_ok:      { title: "19. 추가 퀴즈 정답", src: "audio/extra_ok.mp3" },
+      extra_done:    { title: "20. 추가 퀴즈 완료", src: "audio/extra_done.mp3" },
+      final_all:     { title: "21. 컬렉션 완성", src: "audio/21_final_all.mp3" },
+      final_qr:      { title: "22. QR코드 스캔 안내", src: "audio/22_final_qr.mp3" },
+      final_go:      { title: "23. 보물찾기 시작", src: "audio/23_final_go.mp3" },
+      final_done:    { title: "24. 모든 아이템 획득", src: "audio/24_final_done.mp3" },
+      end_party:     { title: "25. 환생 · 공연 대기", src: "audio/25_end_party.mp3" },
+      end_guest:     { title: "26. 게스트 소개", src: "audio/26_end_guest.mp3" },
+      end_congrats:  { title: "27. 공연 후 생일 축하", src: "audio/27_end_congrats.mp3" }
+    };
+
+    const QUIZ_TOPICS = ["드라마", "화학", "국제", "환경", "심리", "우주", "법률", "세계사", "사회"];
+    const quizWrap = document.getElementById("quizButtons");
+    QUIZ_TOPICS.forEach((topic, idx) => {
+      const i = idx + 1;
+      const key = `quiz_${i}`;
+      const num = String(i).padStart(2, "0");
+      CUES[key] = { title: `퀴즈 · ${topic}`, src: `audio/quiz_${num}.mp3` };
+      const btn = document.createElement("button");
+      btn.className = "cue-btn quiz-btn";
+      btn.dataset.cue = key;
+      btn.textContent = topic;
+      btn.onclick = () => playCue(key);
+      quizWrap.appendChild(btn);
+    });
+
+    const choiceWrap = document.getElementById("ohaChoiceButtons");
+    for (let i = 1; i <= 4; i++) {
+      const key = `oha_choice_${i}`;
+      CUES[key] = { title: `선택 ${i}번`, src: `audio/oha_choice_${i}.mp3` };
+      const btn = document.createElement("button");
+      btn.className = "cue-btn oha-choice-btn";
+      btn.dataset.cue = key;
+      btn.textContent = `${i}번`;
+      btn.onclick = () => playCue(key);
+      choiceWrap.appendChild(btn);
+    }
+
+    const rankWrap = document.getElementById("ohaRankButtons");
+    for (let r = 1; r <= 12; r++) {
+      const key = `oha_rank_${r}`;
+      CUES[key] = { title: `오하아사 ${r}위`, src: `audio/oha_rank_${r}.mp3` };
+      const btn = document.createElement("button");
+      btn.className = "cue-btn oha-rank-btn";
+      btn.dataset.cue = key;
+      btn.textContent = `${r}위`;
+      btn.onclick = () => playCue(key);
+      rankWrap.appendChild(btn);
+    }
+
+    let currentCue = null;
+
+    function formatTime(seconds) {
+      if (!Number.isFinite(seconds)) return "00:00";
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.floor(seconds % 60);
+      return String(minutes).padStart(2, "0") + ":" + String(remainingSeconds).padStart(2, "0");
+    }
+
+    function updatePlayer(audio, prefix) {
+      const current = document.getElementById(prefix + "Current");
+      const duration = document.getElementById(prefix + "Duration");
+      const progress = document.getElementById(prefix + "Progress");
+
+      const curText = formatTime(audio.currentTime);
+      const durText = formatTime(audio.duration);
+
+      if (current) current.textContent = curText;
+      if (duration) duration.textContent = durText;
+
+      let pct = 0;
+      if (Number.isFinite(audio.duration) && audio.duration > 0) {
+        pct = (audio.currentTime / audio.duration) * 100;
+      }
+      if (progress) progress.value = pct;
+
+      if (prefix === "voice") {
+        const stickyTime = document.getElementById("stickyVoiceTime");
+        const stickyProgress = document.getElementById("stickyVoiceProgress");
+        if (stickyTime) stickyTime.textContent = `${curText} / ${durText}`;
+        if (stickyProgress) stickyProgress.value = pct;
+      }
+    }
+
+    function setVoiceTitles(text) {
+      const mainTitle = document.getElementById("voiceTitle");
+      const stickyTitle = document.getElementById("stickyVoiceTitle");
+      if (mainTitle) mainTitle.textContent = text;
+      if (stickyTitle) stickyTitle.textContent = text;
+    }
+
+    bgm.addEventListener("timeupdate", () => updatePlayer(bgm, "music"));
+    bgm.addEventListener("loadedmetadata", () => updatePlayer(bgm, "music"));
+    bgm.addEventListener("ended", () => {
+      bgm.currentTime = 0;
+      updatePlayer(bgm, "music");
+      document.getElementById("musicStatus").textContent = "배경음악이 끝났습니다. 다시 재생할 수 있습니다.";
+    });
+
+    voice.addEventListener("timeupdate", () => updatePlayer(voice, "voice"));
+    voice.addEventListener("loadedmetadata", () => updatePlayer(voice, "voice"));
+    voice.addEventListener("ended", () => {
+      voice.currentTime = 0;
+      updatePlayer(voice, "voice");
+      document.getElementById("voiceStatus").textContent = "음성 재생이 끝났습니다.";
+    });
+
+    async function startMusic() {
+      try {
+        await bgm.play();
+        document.getElementById("musicStatus").textContent = "배경음악 재생 중";
+      } catch (error) {
+        document.getElementById("musicStatus").textContent = "재생 실패: audio 폴더의 bgm.mp3 파일을 확인해 주세요.";
+      }
+    }
+
+    function pauseMusic() {
+      bgm.pause();
+      document.getElementById("musicStatus").textContent = "배경음악 일시정지";
+    }
+
+    function restartMusic() {
+      bgm.currentTime = 0;
+      startMusic();
+      updatePlayer(bgm, "music");
+    }
+
+    function seekMusic(value) {
+      if (Number.isFinite(bgm.duration)) {
+        bgm.currentTime = bgm.duration * value / 100;
+        updatePlayer(bgm, "music");
+      }
+    }
+
+    async function playStartSfx() {
+      try {
+        startSfx.currentTime = 0;
+        await startSfx.play();
+        document.getElementById("voiceStatus").textContent = "시작 효과음 재생 중 (시작 멘트 버튼을 이어서 누르세요)";
+      } catch (error) {
+        document.getElementById("voiceStatus").textContent = `효과음을 재생할 수 없습니다: ${startSfx.src}`;
+      }
+    }
+
+    async function playSuccessSfx() {
+      try {
+        sfx.currentTime = 0;
+        await sfx.play();
+        document.getElementById("voiceStatus").textContent = "축하 효과음 재생 중 (성공 멘트 버튼을 이어서 누르세요)";
+      } catch (error) {
+        document.getElementById("voiceStatus").textContent = `효과음을 재생할 수 없습니다: ${sfx.src}`;
+      }
+    }
+
+    async function playDrumrollSfx() {
+      try {
+        drumrollSfx.currentTime = 0;
+        await drumrollSfx.play();
+        document.getElementById("voiceStatus").textContent = "두구두구 효과음 재생 중";
+      } catch (error) {
+        document.getElementById("voiceStatus").textContent = `효과음을 재생할 수 없습니다: ${drumrollSfx.src}`;
+      }
+    }
+
+    async function playCue(key) {
+      const cue = CUES[key];
+      if (!cue) return;
+      currentCue = key;
+      document.querySelectorAll(".cue-btn").forEach((b) => {
+        b.classList.toggle("active", b.dataset.cue === key);
+      });
+      setVoiceTitles(cue.title);
+      voice.src = cue.src;
+      voice.currentTime = 0;
+      await startVoice();
+    }
+
+    async function startVoice() {
+      if (!voice.src) {
+        document.getElementById("voiceStatus").textContent = "아직 연결된 음성 파일이 없습니다.";
+        return;
+      }
+      try {
+        await voice.play();
+        document.getElementById("voiceStatus").textContent = "진행 음성 재생 중";
+      } catch (error) {
+        document.getElementById("voiceStatus").textContent = `음성을 재생할 수 없습니다: ${voice.src}`;
+      }
+    }
+
+    function pauseVoice() {
+      voice.pause();
+      document.getElementById("voiceStatus").textContent = "진행 음성 일시정지";
+    }
+
+    function restartVoice() {
+      if (!voice.src) return;
+      voice.currentTime = 0;
+      startVoice();
+      updatePlayer(voice, "voice");
+    }
+
+    function seekVoice(value) {
+      if (Number.isFinite(voice.duration)) {
+        voice.currentTime = voice.duration * value / 100;
+        updatePlayer(voice, "voice");
+      }
+    }
+  </script>
+
+</body>
+</html>
